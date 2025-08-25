@@ -20,11 +20,11 @@
     <PackageVersion Include="VSSDK.Settings.11" Version="11.0.4" />
     <PackageVersion Include="VSSDK.Settings.12" Version="12.0.4" />
     <PackageVersion Include="VSSDK.Shell.11" Version="11.0.4" />
-    <PackageVersion Include="xunit" Version="2.4.1" />
-    <PackageVersion Include="xunit.assert" Version="2.4.1" />
-    <PackageVersion Include="xunit.extensibility.core" Version="2.4.1" />
-    <PackageVersion Include="xunit.extensibility.execution" Version="2.4.1" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.3" />
+    <PackageVersion Include="xunit.v3" Version="3.0.1" />
+    <PackageVersion Include="xunit.v3.assert" Version="3.0.1" />
+    <PackageVersion Include="xunit.v3.extensibility.core" Version="3.0.1" />
+    <PackageVersion Include="xunit.v3.runner.common" Version="3.0.1" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
   </ItemGroup>
   <ItemGroup Label="Library.Template">
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />

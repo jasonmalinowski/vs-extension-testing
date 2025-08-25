@@ -2,9 +2,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <RootNamespace>Microsoft.VisualStudio.Extensibility.Testing.Xunit.IntegrationTests</RootNamespace>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,10 +22,7 @@
     <PackageReference Include="stdole" VersionOverride="7.0.3303" PrivateAssets="all" />
     <PackageReference Include="VSSDK.ComponentModelHost" VersionOverride="12.0.4" />
     <PackageReference Include="VSSDK.Editor" VersionOverride="12.0.4" />
-    <PackageReference Include="xunit" />
-    
-    <!-- Continue to use the older runner in the legacy project so we are keeping this on net46 and testing older versions of the runner -->
-    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" VersionOverride="2.4.3"/>
+    <PackageReference Include="xunit.v3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,22 +35,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="$(NuGetPackageRoot)xunit.runner.visualstudio\2.3.1\build\net20\..\_common\xunit.abstractions.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AssemblyAttribute Include="Xunit.TestFrameworkAttribute">
-      <_Parameter1>Xunit.Harness.IdeTestFramework</_Parameter1>
-      <_Parameter2>Microsoft.VisualStudio.Extensibility.Testing.Xunit</_Parameter2>
-    </AssemblyAttribute>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
+  <Import Project="..\Microsoft.VisualStudio.Extensibility.Testing.Xunit.Shared\build\Microsoft.VisualStudio.Extensibility.Testing.Xunit.targets"/>
   <Import Project="..\Microsoft.VisualStudio.Extensibility.Testing.Xunit.IntegrationTests.Shared\Microsoft.VisualStudio.Extensibility.Testing.Xunit.IntegrationTests.Shared.projitems" Label="Shared" />
 
 </Project>

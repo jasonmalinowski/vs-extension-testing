@@ -198,7 +198,7 @@ namespace System.Diagnostics.CodeAnalysis
                         ("Nullable.cs", NullableAttributesSource),
                     },
                 },
-            }.AddGeneratedSources().RunAsync();
+            }.AddGeneratedSources().RunAsync(TestContext.Current.CancellationToken);
         }
 
         [Fact]
@@ -221,7 +221,7 @@ namespace System.Diagnostics.CodeAnalysis
                         ("Nullable.cs", NullableAttributesSource),
                     },
                 },
-            }.AddGeneratedSources().RunAsync();
+            }.AddGeneratedSources().RunAsync(TestContext.Current.CancellationToken);
         }
 
         [Fact]
@@ -245,7 +245,7 @@ namespace System.Diagnostics.CodeAnalysis
                         ("Nullable.cs", NullableAttributesSource),
                     },
                 },
-            }.AddGeneratedSources().RunAsync();
+            }.AddGeneratedSources().RunAsync(TestContext.Current.CancellationToken);
         }
 
         [Fact]
@@ -268,7 +268,7 @@ namespace System.Diagnostics.CodeAnalysis
                         ("Nullable.cs", NullableAttributesSource),
                     },
                 },
-            }.AddGeneratedSources().RunAsync();
+            }.AddGeneratedSources().RunAsync(TestContext.Current.CancellationToken);
         }
 
         [Theory]
@@ -299,7 +299,7 @@ namespace System.Diagnostics.CodeAnalysis
                         ("Nullable.cs", NullableAttributesSource),
                     },
                 },
-            }.AddGeneratedSources().RunAsync();
+            }.AddGeneratedSources().RunAsync(TestContext.Current.CancellationToken);
         }
 
         [Fact]
@@ -326,7 +326,7 @@ namespace System.Diagnostics.CodeAnalysis
                         ("Nullable.cs", NullableAttributesSource),
                     },
                 },
-            }.AddGeneratedSources().RunAsync();
+            }.AddGeneratedSources().RunAsync(TestContext.Current.CancellationToken);
         }
 
         [Fact]
@@ -357,7 +357,7 @@ namespace System.Diagnostics.CodeAnalysis
                         ("Nullable.cs", NullableAttributesSource),
                     },
                 },
-            }.AddGeneratedSources().RunAsync();
+            }.AddGeneratedSources().RunAsync(TestContext.Current.CancellationToken);
         }
     }
 }

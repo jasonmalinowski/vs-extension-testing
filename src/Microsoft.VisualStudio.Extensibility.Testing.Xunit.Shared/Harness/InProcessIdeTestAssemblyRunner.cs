@@ -5,67 +5,58 @@ namespace Xunit.Harness
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
+    using System.Reflection;
     using System.Threading;
-    using Xunit.Abstractions;
+    using System.Threading.Tasks;
     using Xunit.Sdk;
     using Xunit.Threading;
+    using Xunit.v3;
 
-    public class InProcessIdeTestAssemblyRunner : MarshalByRefObject, IDisposable
+    public class InProcessIdeTestAssemblyRunner : LongLivedMarshalByRefObject
     {
-        private readonly TestAssemblyRunner<IXunitTestCase> _testAssemblyRunner;
-
-        public InProcessIdeTestAssemblyRunner(ITestAssembly testAssembly, IEnumerable<IXunitTestCase> testCases, IMessageSink diagnosticMessageSink, IMessageSink executionMessageSink, ITestFrameworkExecutionOptions executionOptions)
+        public Tuple<int, int, int, decimal> RunTestCollection(string testAssembly, HashSet<string> testCaseUniqueIds, DeserializingMessageSink executionMessageSink, ITestFrameworkDiscoveryOptions discoveryOptions, ITestFrameworkExecutionOptions executionOptions)
         {
-            var reconstructedTestCases = testCases.Select(testCase =>
-            {
-                if (testCase is IdeTestCase ideTestCase)
-                {
-                    return new IdeTestCase(diagnosticMessageSink, ideTestCase.DefaultMethodDisplay, ideTestCase.DefaultMethodDisplayOptions, ideTestCase.TestMethod, ideTestCase.VisualStudioInstanceKey, ideTestCase.TestMethodArguments);
-                }
-                else if (testCase is IdeTheoryTestCase ideTheoryTestCase)
-                {
-                    return new IdeTheoryTestCase(diagnosticMessageSink, ideTheoryTestCase.DefaultMethodDisplay, ideTheoryTestCase.DefaultMethodDisplayOptions, ideTheoryTestCase.TestMethod, ideTheoryTestCase.VisualStudioInstanceKey, ideTheoryTestCase.TestMethodArguments);
-                }
-                else if (testCase is IdeInstanceTestCase ideInstanceTestCase)
-                {
-                    return new IdeInstanceTestCase(diagnosticMessageSink, ideInstanceTestCase.DefaultMethodDisplay, ideInstanceTestCase.DefaultMethodDisplayOptions, ideInstanceTestCase.TestMethod, ideInstanceTestCase.VisualStudioInstanceKey, ideInstanceTestCase.TestMethodArguments);
-                }
-
-                return testCase;
-            });
-
-            _testAssemblyRunner = new XunitTestAssemblyRunner(testAssembly, reconstructedTestCases.ToArray(), diagnosticMessageSink, executionMessageSink, executionOptions);
+            // Remoting doesn't support async methods, so we'll have to do a blocking operation here
+#pragma warning disable VSTHRD002
+            return RunTestCollectionAsync(testAssembly, testCaseUniqueIds, executionMessageSink, discoveryOptions, executionOptions).GetAwaiter().GetResult();
+#pragma warning restore VSTHRD002
         }
 
-        public Tuple<int, int, int, decimal> RunTestCollection(IMessageBus messageBus, ITestCollection testCollection, IXunitTestCase[] testCases)
+        private async Task<Tuple<int, int, int, decimal>> RunTestCollectionAsync(string testAssembly, HashSet<string> testCaseUniqueIds, DeserializingMessageSink executionMessageSink, ITestFrameworkDiscoveryOptions discoveryOptions, ITestFrameworkExecutionOptions executionOptions)
         {
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
-                var result = _testAssemblyRunner.RunAsync().GetAwaiter().GetResult();
-#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
+                var assembly = Assembly.LoadFrom(testAssembly);
+                var xunitAssembly = new XunitTestAssembly(assembly);
+
+                // We'll need to rediscover the same tests in-process
+                TestContext.SetForInitialization(null, false, false);
+
+                var discoverer = new XunitTestFrameworkDiscoverer(xunitAssembly, null);
+                var testCases = new List<IXunitTestCase>();
+
+                await discoverer.Find(
+                    testCase =>
+                    {
+                        if (testCaseUniqueIds.Contains(testCase.UniqueID))
+                        {
+                            testCases.Add((IXunitTestCase)testCase);
+                        }
+
+                        return new ValueTask<bool>(true);
+                    },
+                    discoveryOptions);
+
+                var result = await XunitTestAssemblyRunner.Instance.Run(xunitAssembly, testCases, new SerializingMessageSink(executionMessageSink), executionOptions, cancellationTokenSource.Token);
                 return Tuple.Create(result.Total, result.Failed, result.Skipped, result.Time);
             }
         }
 
-        public void Dispose()
+        private class SerializingMessageSink(DeserializingMessageSink executionMessageSink) : IMessageSink
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        // The life of this object is managed explicitly
-        public override object? InitializeLifetimeService()
-        {
-            return null;
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
+            public bool OnMessage(IMessageSinkMessage message)
             {
-                _testAssemblyRunner.Dispose();
+                return executionMessageSink.OnMessage(message.ToJson()!);
             }
         }
     }

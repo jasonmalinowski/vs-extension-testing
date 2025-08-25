@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +20,7 @@
     -->
     <PackageReference Include="Newtonsoft.Json" ExcludeAssets="all" PrivateAssets="all" />
     <PackageReference Include="Roslyn.Diagnostics.Analyzers" PrivateAssets="all" />
-    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.v3"/>
     <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
   </ItemGroup>
 
@@ -34,22 +34,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="$(NuGetPackageRoot)xunit.runner.visualstudio\2.3.1\build\net20\..\_common\xunit.abstractions.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AssemblyAttribute Include="Xunit.TestFrameworkAttribute">
-      <_Parameter1>Xunit.Harness.IdeTestFramework</_Parameter1>
-      <_Parameter2>Microsoft.VisualStudio.Extensibility.Testing.Xunit</_Parameter2>
-    </AssemblyAttribute>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
+  <Import Project="..\Microsoft.VisualStudio.Extensibility.Testing.Xunit.Shared\build\Microsoft.VisualStudio.Extensibility.Testing.Xunit.targets"/>
   <Import Project="..\Microsoft.VisualStudio.Extensibility.Testing.Xunit.IntegrationTests.Shared\Microsoft.VisualStudio.Extensibility.Testing.Xunit.IntegrationTests.Shared.projitems" Label="Shared" />
 
 </Project>

@@ -4,16 +4,13 @@
 namespace Xunit.Threading
 {
     using System.Collections.Generic;
-    using Xunit.Abstractions;
+    using System.Threading.Tasks;
     using Xunit.Sdk;
+    using Xunit.v3;
 
     public class IdeTheoryDiscoverer : TheoryDiscoverer
     {
-        public IdeTheoryDiscoverer(IMessageSink diagnosticMessageSink)
-            : base(diagnosticMessageSink)
-        {
-        }
-
+        /*
         protected override IEnumerable<IXunitTestCase> CreateTestCasesForSkip(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod, IAttributeInfo theoryAttribute, string skipReason)
         {
             foreach (var supportedInstance in IdeFactDiscoverer.GetSupportedInstances(testMethod, theoryAttribute))
@@ -33,29 +30,42 @@ namespace Xunit.Threading
                 yield return new IdeSkippedDataRowTestCase(DiagnosticMessageSink, discoveryOptions.MethodDisplayOrDefault(), discoveryOptions.MethodDisplayOptionsOrDefault(), testMethod, supportedInstance, skipReason, dataRow);
             }
         }
+        */
 
-        protected override IEnumerable<IXunitTestCase> CreateTestCasesForDataRow(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod, IAttributeInfo theoryAttribute, object?[] dataRow)
+        protected override ValueTask<IReadOnlyCollection<IXunitTestCase>> CreateTestCasesForDataRow(
+            ITestFrameworkDiscoveryOptions discoveryOptions,
+            IXunitTestMethod testMethod,
+            ITheoryAttribute theoryAttribute,
+            ITheoryDataRow dataRow,
+            object?[] testMethodArguments)
         {
+            var testCases = new List<IXunitTestCase>();
             foreach (var supportedInstance in IdeFactDiscoverer.GetSupportedInstances(testMethod, theoryAttribute))
             {
-                yield return new IdeTestCase(DiagnosticMessageSink, discoveryOptions.MethodDisplayOrDefault(), discoveryOptions.MethodDisplayOptionsOrDefault(), testMethod, supportedInstance, dataRow);
-                if (IdeInstanceTestCase.TryCreateNewInstanceForFramework(discoveryOptions, DiagnosticMessageSink, supportedInstance) is { } instanceTestCase)
+                testCases.Add(new IdeTestCase(testMethod, supportedInstance, testMethodArguments));
+                if (IdeInstanceTestCase.TryCreateNewInstanceForFramework(discoveryOptions, supportedInstance) is { } instanceTestCase)
                 {
-                    yield return instanceTestCase;
+                    testCases.Add(instanceTestCase);
                 }
             }
+
+            return new ValueTask<IReadOnlyCollection<IXunitTestCase>>(testCases);
         }
 
-        protected override IEnumerable<IXunitTestCase> CreateTestCasesForTheory(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod, IAttributeInfo theoryAttribute)
+        protected override ValueTask<IReadOnlyCollection<IXunitTestCase>> CreateTestCasesForTheory(ITestFrameworkDiscoveryOptions discoveryOptions, IXunitTestMethod testMethod, ITheoryAttribute theoryAttribute)
         {
+            var testCases = new List<IXunitTestCase>();
+
             foreach (var supportedInstance in IdeFactDiscoverer.GetSupportedInstances(testMethod, theoryAttribute))
             {
-                yield return new IdeTheoryTestCase(DiagnosticMessageSink, discoveryOptions.MethodDisplayOrDefault(), discoveryOptions.MethodDisplayOptionsOrDefault(), testMethod, supportedInstance);
-                if (IdeInstanceTestCase.TryCreateNewInstanceForFramework(discoveryOptions, DiagnosticMessageSink, supportedInstance) is { } instanceTestCase)
+                testCases.Add(new IdeTheoryTestCase(testMethod, supportedInstance));
+                if (IdeInstanceTestCase.TryCreateNewInstanceForFramework(discoveryOptions, supportedInstance) is { } instanceTestCase)
                 {
-                    yield return instanceTestCase;
+                    testCases.Add(instanceTestCase);
                 }
             }
+
+            return new ValueTask<IReadOnlyCollection<IXunitTestCase>>(testCases);
         }
     }
 }

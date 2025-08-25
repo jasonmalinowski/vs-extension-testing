@@ -4,14 +4,8 @@
 namespace Xunit.OutOfProcess
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using System.Runtime.Remoting;
-    using Xunit.Abstractions;
     using Xunit.Harness;
     using Xunit.InProcess;
-    using Xunit.Sdk;
 
     internal class TestInvoker_OutOfProc : OutOfProcComponent
     {
@@ -26,9 +20,9 @@ namespace Xunit.OutOfProcess
             get;
         }
 
-        public InProcessIdeTestAssemblyRunner CreateTestAssemblyRunner(ITestAssembly testAssembly, IXunitTestCase[] testCases, IMessageSink diagnosticMessageSink, IMessageSink executionMessageSink, ITestFrameworkExecutionOptions executionOptions)
+        public InProcessIdeTestAssemblyRunner CreateTestAssemblyRunner()
         {
-            return TestInvokerInProc.CreateTestAssemblyRunner(testAssembly, testCases, diagnosticMessageSink, executionMessageSink, executionOptions);
+            return TestInvokerInProc.CreateTestAssemblyRunner();
         }
 
         private class TestOutputHelperWrapper : MarshalByRefObject, ITestOutputHelper
@@ -40,20 +34,32 @@ namespace Xunit.OutOfProcess
                 _testOutputHelper = testOutputHelper;
             }
 
-            public void WriteLine(string message)
-            {
-                _testOutputHelper.WriteLine(message);
-            }
-
-            public void WriteLine(string format, params object?[] args)
-            {
-                _testOutputHelper.WriteLine(format, args);
-            }
+            public string Output => _testOutputHelper.Output;
 
             // The life of this object is managed explicitly
             public override object? InitializeLifetimeService()
             {
                 return null;
+            }
+
+            public void Write(string message)
+            {
+                _testOutputHelper.Write(message);
+            }
+
+            public void Write(string format, params object[] args)
+            {
+                _testOutputHelper.Write(format, args);
+            }
+
+            public void WriteLine(string message)
+            {
+                _testOutputHelper.WriteLine(message);
+            }
+
+            public void WriteLine(string format, params object[] args)
+            {
+                _testOutputHelper.WriteLine(format, args);
             }
         }
     }

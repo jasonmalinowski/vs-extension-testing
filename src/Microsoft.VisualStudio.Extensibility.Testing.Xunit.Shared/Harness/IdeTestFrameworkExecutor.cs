@@ -4,25 +4,28 @@
 namespace Xunit.Harness
 {
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Reflection;
-    using Xunit.Abstractions;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Xunit.Sdk;
+    using Xunit.v3;
 
+    /// <summary>
+    /// The implementation of <see cref="ITestFrameworkExecutor"/> that is invoked by xunit in the test process.
+    /// </summary>
     public class IdeTestFrameworkExecutor : XunitTestFrameworkExecutor
     {
-        public IdeTestFrameworkExecutor(AssemblyName assemblyName, ISourceInformationProvider sourceInformationProvider, IMessageSink diagnosticMessageSink)
-            : base(assemblyName, sourceInformationProvider, diagnosticMessageSink)
+        private readonly ITestFrameworkDiscoveryOptions _discoveryOptions;
+
+        public IdeTestFrameworkExecutor(IXunitTestAssembly assembly, ITestFrameworkDiscoveryOptions discoveryOptions)
+            : base(assembly)
         {
+            _discoveryOptions = discoveryOptions;
         }
 
-        [SuppressMessage("Usage", "VSTHRD100:Avoid async void methods", Justification = "Follows pattern expected by Xunit framework.")]
-        protected override async void RunTestCases(IEnumerable<IXunitTestCase> testCases, IMessageSink executionMessageSink, ITestFrameworkExecutionOptions executionOptions)
+        public override async ValueTask RunTestCases(IReadOnlyCollection<IXunitTestCase> testCases, IMessageSink executionMessageSink, ITestFrameworkExecutionOptions executionOptions, CancellationToken cancellationToken)
         {
-            using (var assemblyRunner = new IdeTestAssemblyRunner(TestAssembly, testCases, DiagnosticMessageSink, executionMessageSink, executionOptions))
-            {
-                await assemblyRunner.RunAsync();
-            }
+            var assemblyRunner = new IdeTestAssemblyRunner(executionMessageSink, _discoveryOptions, executionOptions);
+            await assemblyRunner.Run(TestAssembly, testCases, executionMessageSink, executionOptions, cancellationToken);
         }
     }
 }

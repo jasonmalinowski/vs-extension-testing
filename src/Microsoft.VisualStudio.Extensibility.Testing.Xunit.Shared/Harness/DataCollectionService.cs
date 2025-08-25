@@ -10,7 +10,6 @@ namespace Xunit.Harness
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Runtime.ExceptionServices;
-    using Xunit.Abstractions;
     using Xunit.Sdk;
 
     public static class DataCollectionService
@@ -96,11 +95,11 @@ namespace Xunit.Harness
 
         internal static string GetTestName(ITestCase testCase)
         {
-            var testMethod = testCase.TestMethod.Method;
-            var testClass = testMethod.Type.Name;
+            var testMethodName = testCase.TestMethodName!;
+            var testClass = testCase.TestClassName!;
             var lastDot = testClass.LastIndexOf('.');
             testClass = testClass.Substring(lastDot + 1);
-            return $"{testClass}.{testMethod.Name}";
+            return $"{testClass}.{testMethodName}";
         }
 
         internal static void InstallFirstChanceExceptionHandler()

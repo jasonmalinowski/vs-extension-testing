@@ -40,7 +40,7 @@ Add the following to **AssemblyInfo.cs** to enable the test framework:
 ```csharp
 using Xunit;
 
-[assembly: TestFramework("Xunit.Harness.IdeTestFramework", "Microsoft.VisualStudio.Extensibility.Testing.Xunit")]
+[assembly: TestFramework(typeof(Xunit.Harness.IdeTestFramework))]
 ```
 
 #### SDK projects

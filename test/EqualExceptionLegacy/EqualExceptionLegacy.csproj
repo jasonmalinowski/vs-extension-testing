@@ -2,9 +2,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Nullable>disable</Nullable>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,19 +20,14 @@
     <PackageReference Include="Microsoft.VisualStudio.Threading" VersionOverride="12.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.12.0" VersionOverride="12.0.30111" />
     <PackageReference Include="stdole" VersionOverride="7.0.3303" PrivateAssets="all" />
-    <PackageReference Include="xunit" />
-
-    <!-- Continue to use the older runner in the legacy project so we are keeping this on net46 and testing older versions of the runner -->
-    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" VersionOverride="2.4.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="$(NuGetPackageRoot)xunit.runner.visualstudio\2.3.1\build\net20\..\_common\xunit.abstractions.dll" />
+    <PackageReference Include="xunit.v3"/>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.VisualStudio.Extensibility.Testing.Xunit.Legacy\Microsoft.VisualStudio.Extensibility.Testing.Xunit.Legacy.csproj" />
   </ItemGroup>
+
+  <Import Project="..\..\src\Microsoft.VisualStudio.Extensibility.Testing.Xunit.Shared\build\Microsoft.VisualStudio.Extensibility.Testing.Xunit.targets"/>
 
   <ItemGroup>
     <None Update="xunit.runner.json">

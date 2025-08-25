@@ -7,11 +7,9 @@ namespace Xunit.Threading
     using System.Collections.Immutable;
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Xunit.Abstractions;
     using Xunit.Harness;
     using Xunit.Sdk;
+    using Xunit.v3;
 
     public sealed class IdeInstanceTestCase : IdeTestCaseBase
     {
@@ -31,15 +29,15 @@ namespace Xunit.Threading
         {
         }
 
-        public IdeInstanceTestCase(IMessageSink diagnosticMessageSink, TestMethodDisplay defaultMethodDisplay, TestMethodDisplayOptions defaultMethodDisplayOptions, ITestMethod testMethod, VisualStudioInstanceKey visualStudioInstanceKey, object?[]? testMethodArguments = null)
-            : base(diagnosticMessageSink, defaultMethodDisplay, defaultMethodDisplayOptions, testMethod, visualStudioInstanceKey, testMethodArguments)
+        public IdeInstanceTestCase(IXunitTestMethod testMethod, VisualStudioInstanceKey visualStudioInstanceKey, bool includeRootSuffixInDisplayName, object?[]? testMethodArguments = null)
+            : base(testMethod, visualStudioInstanceKey, includeRootSuffixInDisplayName: true, testMethodArguments)
         {
         }
 
-        protected override bool IncludeRootSuffixInDisplayName => true;
-
-        public static IdeInstanceTestCase? TryCreateNewInstanceForFramework(ITestFrameworkDiscoveryOptions discoveryOptions, IMessageSink diagnosticMessageSink, VisualStudioInstanceKey visualStudioInstanceKey)
+        public static IdeInstanceTestCase? TryCreateNewInstanceForFramework(ITestFrameworkDiscoveryOptions discoveryOptions, VisualStudioInstanceKey visualStudioInstanceKey)
         {
+#if IDE_INSTANCE_TEST_CASE_SUPPORT
+
             var lazyInstances = _instances.GetValue(discoveryOptions, static _ => new StrongBox<ImmutableDictionary<VisualStudioInstanceKey, IdeInstanceTestCase>>(ImmutableDictionary<VisualStudioInstanceKey, IdeInstanceTestCase>.Empty));
             var candidateTestCase = new IdeInstanceTestCase(diagnosticMessageSink, discoveryOptions.MethodDisplayOrDefault(), discoveryOptions.MethodDisplayOptionsOrDefault(), IdeFactDiscoverer.CreateVisualStudioTestMethod(visualStudioInstanceKey), visualStudioInstanceKey);
             var testCase = ImmutableInterlocked.GetOrAdd(ref lazyInstances.Value, visualStudioInstanceKey, candidateTestCase);
@@ -50,7 +48,15 @@ namespace Xunit.Threading
             }
 
             return candidateTestCase;
+
+#else
+
+            return null;
+
+#endif
         }
+
+#if IDE_INSTANCE_TEST_CASE_SUPPORT
 
         public override Task<RunSummary> RunAsync(IMessageSink diagnosticMessageSink, IMessageBus messageBus, object[] constructorArguments, ExceptionAggregator aggregator, CancellationTokenSource cancellationTokenSource)
         {
@@ -67,5 +73,8 @@ namespace Xunit.Threading
 
             return runner.RunAsync();
         }
+
+#endif
+
     }
 }

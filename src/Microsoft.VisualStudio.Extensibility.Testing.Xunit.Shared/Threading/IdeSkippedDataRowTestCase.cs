@@ -3,11 +3,7 @@
 
 namespace Xunit.Threading
 {
-    using System;
-    using System.ComponentModel;
-    using Xunit.Abstractions;
-    using Xunit.Harness;
-    using Xunit.Sdk;
+    /*
 
     public sealed class IdeSkippedDataRowTestCase : XunitSkippedDataRowTestCase
     {
@@ -29,7 +25,7 @@ namespace Xunit.Threading
             private set;
         }
 
-        protected override string GetDisplayName(IAttributeInfo factAttribute, string displayName)
+        protected override string GetDisplayName(IFactAttribute factAttribute, string displayName)
         {
             var baseName = base.GetDisplayName(factAttribute, displayName);
             return $"{baseName} ({VisualStudioInstanceKey.Version})";
@@ -62,4 +58,5 @@ namespace Xunit.Threading
             base.Deserialize(data);
         }
     }
+    */
 }

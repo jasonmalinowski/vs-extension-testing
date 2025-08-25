@@ -5,6 +5,9 @@ namespace Xunit.Harness
 {
     using System;
 
+    /// <summary>
+    /// Specifies an .vsix extension that will be installed before running this assembly's tests.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public class RequireExtensionAttribute : Attribute
     {

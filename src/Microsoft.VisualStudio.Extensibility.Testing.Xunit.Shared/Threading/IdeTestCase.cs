@@ -5,11 +5,8 @@ namespace Xunit.Threading
 {
     using System;
     using System.ComponentModel;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Xunit.Abstractions;
     using Xunit.Harness;
-    using Xunit.Sdk;
+    using Xunit.v3;
 
     public sealed class IdeTestCase : IdeTestCaseBase
     {
@@ -19,11 +16,12 @@ namespace Xunit.Threading
         {
         }
 
-        public IdeTestCase(IMessageSink diagnosticMessageSink, TestMethodDisplay defaultMethodDisplay, TestMethodDisplayOptions defaultMethodDisplayOptions, ITestMethod testMethod, VisualStudioInstanceKey visualStudioInstanceKey, object?[]? testMethodArguments = null)
-            : base(diagnosticMessageSink, defaultMethodDisplay, defaultMethodDisplayOptions, testMethod, visualStudioInstanceKey, testMethodArguments)
+        public IdeTestCase(IXunitTestMethod testMethod, VisualStudioInstanceKey visualStudioInstanceKey, object?[]? testMethodArguments = null)
+            : base(testMethod, visualStudioInstanceKey, includeRootSuffixInDisplayName: false, testMethodArguments)
         {
         }
 
+        /*
         public override Task<RunSummary> RunAsync(IMessageSink diagnosticMessageSink, IMessageBus messageBus, object[] constructorArguments, ExceptionAggregator aggregator, CancellationTokenSource cancellationTokenSource)
         {
             TestCaseRunner<IXunitTestCase> runner;
@@ -39,5 +37,6 @@ namespace Xunit.Threading
 
             return runner.RunAsync();
         }
+        */
     }
 }

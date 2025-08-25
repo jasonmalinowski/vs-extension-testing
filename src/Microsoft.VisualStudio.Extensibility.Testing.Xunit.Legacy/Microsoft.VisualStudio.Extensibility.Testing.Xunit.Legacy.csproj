@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <!-- The assembly name must be consistent so consumers don't need to conditionally-specify TestFrameworkAttribute -->
     <AssemblyName>Microsoft.VisualStudio.Extensibility.Testing.Xunit</AssemblyName>
     <RootNamespace>Xunit</RootNamespace>
@@ -28,10 +28,9 @@
     <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.8.0" VersionOverride="8.0.50728" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Windows.CsWin32" PrivateAssets="all" />
     <PackageReference Include="stdole" VersionOverride="7.0.3303" PrivateAssets="all" />
-    <PackageReference Include="System.Collections.Immutable" VersionOverride="1.1.36" />
-    <PackageReference Include="xunit.assert" />
-    <PackageReference Include="xunit.extensibility.core" />
-    <PackageReference Include="xunit.extensibility.execution" />
+    <PackageReference Include="xunit.v3.assert" />
+    <PackageReference Include="xunit.v3.extensibility.core" />
+    <PackageReference Include="xunit.v3.runner.common" />
   </ItemGroup>
 
   <ItemGroup>
